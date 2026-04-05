@@ -56,18 +56,19 @@ XX::Token XX::Scanner::string() {
                line};
 }
 
-// TODO : Complete digit function()
-// I know that this function is need yet complete.
 XX::Token XX::Scanner::digit() {
   bool is_float = false;
-  while ((isdigit(peek()) && !isAtEnd()) || peek() == '.') {
-    if (peek() == '.' && peekNext() == '.')
-      return Token{TokenType::NUMBER_INT, source.substr(start, current - start),
-                   line};
-    if (peek() == '.')
-      is_float = true;
+
+  while (isdigit(peek()) && !isAtEnd())
     advance();
+
+  if (peek() == '.' && isdigit(peekNext())) {
+    is_float = true;
+    advance();
+    while (isdigit(peek()) && !isAtEnd())
+      advance();
   }
+
   return (is_float) ? Token{TokenType::NUMBER_FLOAT,
                             source.substr(start, current - start), line}
                     : Token{TokenType::NUMBER_INT,
