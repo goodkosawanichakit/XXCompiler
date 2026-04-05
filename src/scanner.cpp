@@ -21,6 +21,12 @@ char XX::Scanner::peek() {
   return source[current];
 }
 
+char XX::Scanner::peekNext() {
+  if (isAtEnd())
+    return '\0';
+  return source[current + 1];
+}
+
 void XX::Scanner::skipWhitespace() {
   while (!isAtEnd())
     switch (peek()) {
@@ -38,8 +44,40 @@ void XX::Scanner::skipWhitespace() {
     }
 }
 
+XX::Token XX::Scanner::string() {
+  while (peek() != '"' && !isAtEnd())
+    advance();
+  if (isAtEnd()) {
+    // TODO : I've no idea what I should return, so yeah maybe one day I'll
+    // know.
+  }
+  advance();
+  return Token{TokenType::STRING, source.substr(start + 1, current - start - 2),
+               line};
+}
+
+// TODO : Complete digit function()
+// I know that this function is need yet complete.
+XX::Token XX::Scanner::digit() {
+  bool is_float = false;
+  while ((isdigit(peek()) && !isAtEnd()) || peek() == '.') {
+    if (peek() == '.' && peekNext() == '.')
+      return Token{TokenType::NUMBER_INT, source.substr(start, current - start),
+                   line};
+    if (peek() == '.')
+      is_float = true;
+    advance();
+  }
+  return (is_float) ? Token{TokenType::NUMBER_FLOAT,
+                            source.substr(start, current - start), line}
+                    : Token{TokenType::NUMBER_INT,
+                            source.substr(start, current - start), line};
+}
+
 XX::Token XX::Scanner::scanToken() {
   skipWhitespace();
+
+  start = current;
 
   if (isAtEnd())
     return Token{TokenType::TOKEN_EOF, "", line};
@@ -87,6 +125,11 @@ XX::Token XX::Scanner::scanToken() {
     if (match('='))
       return Token{TokenType::GREATER_EQUAL, ">=", line};
     return Token{TokenType::GREATER, ">", line};
+  case '"':
+    return string();
+  default:
+    if (isdigit(c))
+      return digit();
   }
 
   return Token{TokenType::TOKEN_EOF, "", line};

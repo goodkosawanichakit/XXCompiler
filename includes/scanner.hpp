@@ -60,7 +60,7 @@ struct Token {
 
 class Scanner {
 private:
-  std::string source;
+  const std::string &source;
   size_t start = 0;
   size_t current = 0;
   int line = 1;
@@ -69,11 +69,14 @@ private:
   bool match(char c);
   char advance();
   char peek();
+  char peekNext();
   void skipWhitespace();
+  Token digit();
+  Token string();
 
 public:
   Scanner(const std::string &source);
   Token scanToken();
 };
 
-} // namespace compiler
+} // namespace XX
