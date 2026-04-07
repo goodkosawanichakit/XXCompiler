@@ -76,6 +76,8 @@ private:
   char peek();
   char peekNext();
   void skipWhitespace();
+  void comment();
+  void mcomment();
   Token digit();
   Token string();
   Token identifier();
