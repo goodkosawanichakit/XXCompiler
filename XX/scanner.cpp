@@ -1,5 +1,4 @@
 #include "scanner.hpp"
-#include <cctype>
 
 std::unordered_map<std::string, XX::TokenType> XX::Scanner::reserve_word = {
     {"int", XX::TokenType::KW_INT},   {"float", XX::TokenType::KW_FLOAT},
