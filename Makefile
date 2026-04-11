@@ -1,6 +1,6 @@
 CXX = g++ # C compiler
-CXXFLAGS = -Wall -Wextra -Werror -g -I./includes/ # Compiler flags
-SRC_DIR = XX
+CXXFLAGS = -Wall -Wextra -Werror -g -IXX/includes # Compiler flags
+SRC_DIR = XX/src
 OBJ_DIR = obj
 BIN_DIR = bin
 
