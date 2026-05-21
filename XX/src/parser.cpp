@@ -1,6 +1,8 @@
 #include "parser.hpp"
 #include "ast.hpp"
 #include "scanner.hpp"
+#include <cstdint>
+#include <string>
 
 void XX::Parser::advance() {
   previousToken = currentToken;
@@ -46,20 +48,22 @@ XX::AST::Node *XX::Parser::parse() {
     case TokenType::KW_FLOAT16:
     case TokenType::KW_FLOAT32:
     case TokenType::KW_FLOAT64:
-      parseVarDeclr();
+      return parseVarDeclr();
       break;
     default:
       // TODO: I don't know what I'm gonna do, C++ make me wanna cry
       return nullptr;
     }
   }
-  return module;
+  return nullptr;
 }
 
 // VarDeclr = type identifiers "="  (Expr | BinaryExpr) ";"
+// BinaryExor is for later cause I'm suck
 XX::AST::VarDeclr *XX::Parser::parseVarDeclr() {
   AST::Type t = matchType(currentToken.type);
-
+  uint32_t o = currentToken.offset;
+  uint16_t l = currentToken.length;
   advance();
   std::string name = source.substr(currentToken.offset, currentToken.length);
 
@@ -70,18 +74,35 @@ XX::AST::VarDeclr *XX::Parser::parseVarDeclr() {
 
   advance();
 
-  return;
+  XX::AST::Expr *value = parseExpr();
+
+  return new AST::VarDeclr(o, l, t, name, value);
 }
 
 // What's the Expression?
 // I don't have any idea either, JK
-// Expr = IntLiteral \ FloatLiteral
+// Expr = IntLiteral | FloatLiteral | BinaryExpr | ...
 XX::AST::Expr *XX::Parser::parseExpr() {
-  std::string literal = source.substr(currentToken.offset, currentToken.length);
   switch (currentToken.type) {
-  case XX::TokenType::KW_INT8:
-    return new AST::IntLiteral(0, 0, AST::Type::INT8, std::stoll(literal));
-  default: // prob unreachable
+  case TokenType::NUMBER_INT:
+    return parseIntLiteral();
+  case TokenType::NUMBER_FLOAT:
+    return parseFloatLiteral();
+  default:
+    // TODO: DMC short for developer may cry. although I'm just a vibe coder
+    // (tho this code node vibe coded but I do talking with llm alot)
     return nullptr;
   }
+}
+
+XX::AST::IntLiteral *XX::Parser::parseIntLiteral() {
+  return new AST::IntLiteral(
+      currentToken.offset, currentToken.length,
+      std::stoll(source.substr(currentToken.offset, currentToken.length)));
+}
+
+XX::AST::FloatLiteral *XX::Parser::parseFloatLiteral() {
+  return new AST::FloatLiteral(
+      currentToken.offset, currentToken.length,
+      std::stod(source.substr(currentToken.offset, currentToken.length)));
 }

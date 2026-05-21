@@ -15,12 +15,14 @@ private:
   void advance();
   bool match(TokenType t);
   AST::Type matchType(TokenType t);
+  AST::VarDeclr *parseVarDeclr();
+  AST::Expr *parseExpr();
+  AST::BinaryExpr *parseBinaryExpr();
+  AST::IntLiteral *parseIntLiteral();
+  AST::FloatLiteral *parseFloatLiteral();
 
 public:
   AST::Node *parse();
-  AST::VarDeclr *parseVarDeclr();
-  AST::Expr *parseExpr();
-  AST::BinaryExpr parseBinaryExpr();
   Parser(Scanner &s, std::string &sc) : scanner(s), source(sc) { advance(); }
   ~Parser() {}
 };

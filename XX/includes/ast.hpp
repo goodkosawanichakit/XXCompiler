@@ -22,17 +22,15 @@ enum class Type {
 class Node {
 private:
   Kind kind;
-  // is line, number really necessary?
-  // do I need to umm contain? Have length?
-  int line;
-  int column;
+  uint32_t offset;
+  uint16_t length;
 
 public:
-  inline int getLine() { return line; }
-  inline int getCol() { return column; }
+  inline int getOffset() { return offset; }
+  inline int getLength() { return length; }
   inline Kind getKind() { return kind; }
 
-  Node(Kind k, int l, int c) : kind(k), line(l), column(c) {}
+  Node(Kind k, uint32_t o, uint16_t l) : kind(k), offset(o), length(l) {}
   ~Node() {}
 };
 
@@ -65,8 +63,8 @@ public:
   inline Expr *getLExpr() { return LExpr; }
   inline Expr *getRExpr() { return RExpr; }
 
-  BinaryExpr(int l, int c, char op, Expr *lexpr, Expr *rexpr)
-      : Expr(Kind::BINARY_EXPR, l, c), op(op), LExpr(lexpr), RExpr(rexpr) {}
+  BinaryExpr(uint32_t o, uint16_t l, char op, Expr *lexpr, Expr *rexpr)
+      : Expr(Kind::BINARY_EXPR, o, l), op(op), LExpr(lexpr), RExpr(rexpr) {}
 
   ~BinaryExpr() {}
 };
@@ -81,8 +79,8 @@ private:
 public:
   inline int64_t getValue() { return value; }
 
-  IntLiteral(int l, int c, int64_t v)
-      : Expr(Kind::INT_LITERAL, l, c), value(v) {}
+  IntLiteral(uint32_t o, uint16_t l, int64_t v)
+      : Expr(Kind::INT_LITERAL, o, l), value(v) {}
 
   ~IntLiteral() {}
 };
@@ -94,8 +92,8 @@ private:
 public:
   inline double getValue() { return value; }
 
-  FloatLiteral(int l, int c, double v)
-      : Expr(Kind::FLOAT_LITERAL, l, c), value(v) {}
+  FloatLiteral(uint32_t o, uint16_t l, double v)
+      : Expr(Kind::FLOAT_LITERAL, o, l), value(v) {}
 
   ~FloatLiteral() {}
 };
@@ -112,8 +110,8 @@ public:
   inline std::string getVarName() { return varName; }
   inline Expr *getExpr() { return whatShouldInameIt; }
 
-  VarDeclr(int l, int c, Type t, std::string n, Expr *init)
-      : Stmt(Kind::VAR_DECLR, l, c), type(t), varName(n),
+  VarDeclr(uint32_t o, uint16_t l, Type t, std::string n, Expr *init)
+      : Stmt(Kind::VAR_DECLR, o, l), type(t), varName(n),
         whatShouldInameIt(init) {}
   ~VarDeclr() {}
 };

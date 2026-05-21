@@ -4,3 +4,4 @@ compile_commands.*
 bin/
 obj/
 *.xx
+*.XX
