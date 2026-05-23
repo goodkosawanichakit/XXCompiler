@@ -14,10 +14,12 @@ private:
 
   void advance();
   bool match(TokenType t);
+  bool isOP();
   AST::Type matchType(TokenType t);
   AST::VarDeclr *parseVarDeclr();
   AST::Expr *parseExpr();
   AST::BinaryExpr *parseBinaryExpr();
+  AST::Expr *parseLiteral();
   AST::IntLiteral *parseIntLiteral();
   AST::FloatLiteral *parseFloatLiteral();
 

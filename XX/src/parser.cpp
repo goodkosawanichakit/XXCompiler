@@ -37,6 +37,18 @@ XX::AST::Type XX::Parser::matchType(XX::TokenType t) {
   }
 }
 
+bool XX::Parser::isOP() {
+  switch (currentToken.type) {
+  case TokenType::PLUS:
+  case TokenType::MINUS:
+  case TokenType::STAR:
+  case TokenType::SLASH:
+    return true;
+  default:
+    return false;
+  }
+}
+
 XX::AST::Node *XX::Parser::parse() {
   while (currentToken.type != TokenType::TOKEN_EOF) {
     switch (currentToken.type) {
@@ -65,6 +77,9 @@ XX::AST::VarDeclr *XX::Parser::parseVarDeclr() {
   uint32_t o = currentToken.offset;
   uint16_t l = currentToken.length;
   advance();
+  if (match(TokenType::EQUAL))
+    return nullptr;
+
   std::string name = source.substr(currentToken.offset, currentToken.length);
 
   advance();
@@ -75,7 +90,7 @@ XX::AST::VarDeclr *XX::Parser::parseVarDeclr() {
   advance();
 
   XX::AST::Expr *value = parseExpr();
-
+  advance();
   return new AST::VarDeclr(o, l, t, name, value);
 }
 
@@ -83,6 +98,23 @@ XX::AST::VarDeclr *XX::Parser::parseVarDeclr() {
 // I don't have any idea either, JK
 // Expr = IntLiteral | FloatLiteral | BinaryExpr | ...
 XX::AST::Expr *XX::Parser::parseExpr() {
+  AST::Expr *left = parseLiteral();
+
+  advance();
+  if (!isOP())
+    return left;
+
+  uint32_t o = currentToken.offset;
+  uint16_t l = currentToken.length;
+  std::string op = source.substr(currentToken.offset, currentToken.length);
+
+  advance();
+  AST::Expr *right = parseExpr();
+
+  return new AST::BinaryExpr(o, l, op, left, right);
+}
+
+XX::AST::Expr *XX::Parser::parseLiteral() {
   switch (currentToken.type) {
   case TokenType::NUMBER_INT:
     return parseIntLiteral();
@@ -90,7 +122,7 @@ XX::AST::Expr *XX::Parser::parseExpr() {
     return parseFloatLiteral();
   default:
     // TODO: DMC short for developer may cry. although I'm just a vibe coder
-    // (tho this code node vibe coded but I do talking with llm alot)
+    // (tho this code not vibe coded but I do talking with llm alot)
     return nullptr;
   }
 }
