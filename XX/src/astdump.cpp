@@ -1,6 +1,8 @@
 #include "astdump.hpp"
+#include "ast.hpp"
 #include <iostream>
 
+// TBH these two match function is llm generated cause I'm lazy.
 std::string matchEnumKind(XX::AST::Kind k) {
   switch (k) {
   case XX::AST::Kind::EXPR:
@@ -16,6 +18,7 @@ std::string matchEnumKind(XX::AST::Kind k) {
   }
   return "UNKNOWN_KIND";
 }
+
 std::string matchEnumType(XX::AST::Type t) {
   switch (t) {
   case XX::AST::Type::INT8:
@@ -38,44 +41,75 @@ std::string matchEnumType(XX::AST::Type t) {
   return "UNKNOWN_TYPE";
 }
 
-void handleIntLiteral(XX::AST::IntLiteral *TSnotRootAnymore) {
-  std::cout << "Value: " << TSnotRootAnymore->getValue() << "\n";
+uint32_t XX::AST::Dumper::getLine(uint32_t of) {
+  if (lineOffset.empty())
+    return 1;
+  int l = 0;
+  int r = lineOffset.size() - 1;
+  uint32_t target = lineOffset.size();
+  while (l <= r) {
+    int m = l + (r - l) / 2;
+
+    if (lineOffset[m] > of) {
+      target = m;
+      r = m - 1;
+    } else {
+      l = m + 1;
+    }
+  }
+
+  return target;
 }
 
-void handleExpr(XX::AST::Expr *root) {
-  switch (root->getKind()) {
-  case XX::AST::Kind::INT_LITERAL:
-    handleIntLiteral((XX::AST::IntLiteral *)root);
+void XX::AST::Dumper::dump(Node *node) {
+  if (!node)
     return;
-  case XX::AST::Kind::FLOAT_LITERAL:
-    // it's raining taco
+  switch (node->getKind()) {
+  case Kind::VAR_DECLR:
+    dumpVarDeclr((VarDeclr *)node);
+    break;
   default:
-    std::cout << "We shouldn't be here\n";
+    // TODO: IDK what I need to handle in this deafult section.
+    // so todo is I need to think what I'm gonna do
+    std::cout << "You shouldn't be here." << std::endl;
   }
 }
 
-// void handleBinaryExpr(XX::AST::BinaryExpr *root) {
-//   std::cout << root.
-// }
-
-void handleVarDeclr(XX::AST::VarDeclr *root) {
-  std::cout << matchEnumKind(root->getKind()) << ' '
-            << matchEnumType(root->getType()) << root->getVarName();
-  if (!(root->getExpr()))
+// Prob work fine I think
+void XX::AST::Dumper::dumpVarDeclr(VarDeclr *node) {
+  if (!node)
     return;
-  handleExpr(root->getExpr());
+  std::cout << matchEnumKind(node->getKind()) << ' '
+            << matchEnumType(node->getType()) << " Name: " << node->getVarName()
+            << ' ' << getLine(node->getOffset()) << std::endl;
+  dumpExpr(node->getExpr());
 }
 
-void traverse(XX::AST::Node *root) {
-  if (!root)
+void XX::AST::Dumper::dumpExpr(Expr *node) {
+  if (!node)
     return;
-
-  switch (root->getKind()) {
-  case XX::AST::Kind::VAR_DECLR:
-    handleVarDeclr((XX::AST::VarDeclr *)root);
-    return;
+  switch (node->getKind()) {
+  case Kind::INT_LITERAL:
+    return dumpIntLiteral((IntLiteral *)node);
+  case Kind::BINARY_EXPR:
+    return dumpBinaryExpr((BinaryExpr *)node);
   default:
-    std::cout << "How did we even get here\n";
-    return;
+    std::cout << "How did you get here." << std::endl;
   }
+}
+
+void XX::AST::Dumper::dumpBinaryExpr(BinaryExpr *node) {
+  if (!node)
+    return;
+  std::cout << matchEnumKind(node->getKind()) << " Operator: " << node->getOP()
+            << ' ' << getLine(node->getOffset()) << std::endl;
+  dumpExpr(node->getLExpr());
+  dumpExpr(node->getRExpr());
+}
+
+void XX::AST::Dumper::dumpIntLiteral(IntLiteral *node) {
+  if (!node)
+    return;
+  std::cout << matchEnumKind(node->getKind()) << " Value: " << node->getValue()
+            << std::endl;
 }

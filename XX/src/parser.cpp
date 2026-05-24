@@ -71,14 +71,13 @@ XX::AST::Node *XX::Parser::parse() {
 }
 
 // VarDeclr = type identifiers "="  (Expr | BinaryExpr) ";"
-// BinaryExor is for later cause I'm suck
+// BinaryExpr is for later cause I'm suck
+// P.S I think I'm finish the BinaryExpr tho.
 XX::AST::VarDeclr *XX::Parser::parseVarDeclr() {
   AST::Type t = matchType(currentToken.type);
   uint32_t o = currentToken.offset;
   uint16_t l = currentToken.length;
   advance();
-  if (match(TokenType::EQUAL))
-    return nullptr;
 
   std::string name = source.substr(currentToken.offset, currentToken.length);
 

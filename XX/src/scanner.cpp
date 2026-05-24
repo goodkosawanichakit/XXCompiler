@@ -15,6 +15,8 @@ std::unordered_map<std::string, XX::TokenType> XX::Scanner::reserve_words = {
 
 XX::Scanner::Scanner(const std::string &source) : source(source) {}
 
+const std::vector<uint32_t> &XX::Scanner::getLineOffset() { return lineOffset; }
+
 bool XX::Scanner::isAtEnd() { return current >= source.length(); }
 
 bool XX::Scanner::match(char c) {

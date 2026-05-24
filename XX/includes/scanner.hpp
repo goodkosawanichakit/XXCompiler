@@ -90,7 +90,7 @@ private:
   size_t start = 0;
   size_t current = 0;
   size_t line = 1;
-  std::vector<size_t> lineOffset;
+  std::vector<uint32_t> lineOffset;
   std::vector<Error> error_;
   static std::unordered_map<std::string, TokenType> reserve_words;
 
@@ -107,8 +107,9 @@ private:
   Token identifier();
 
 public:
-  Scanner(const std::string &source);
   Token scanToken();
+  const std::vector<uint32_t> &getLineOffset();
+  Scanner(const std::string &source);
 };
 
 } // namespace XX

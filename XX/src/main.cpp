@@ -2,9 +2,9 @@
 #include "astdump.hpp"
 #include "parser.hpp"
 #include "scanner.hpp"
-#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 int main(int argc, char *argv[]) {
   if (argc < 2)
@@ -25,7 +25,8 @@ int main(int argc, char *argv[]) {
 
   XX::AST::Node *root = parser.parse();
 
-  traverse(root);
+  XX::AST::Dumper dumper(scanner.getLineOffset());
+  dumper.dump(root);
 
   return 0;
 }
