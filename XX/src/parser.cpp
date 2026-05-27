@@ -113,6 +113,7 @@ XX::AST::VarDeclr *XX::Parser::parseVarDeclr() {
 //
 //   return new AST::BinaryExpr(o, l, op, left, right);
 // }
+
 int XX::Parser::getBindingPower(XX::TokenType t) {
   switch (t) {
   case TokenType::PLUS:
@@ -126,20 +127,19 @@ int XX::Parser::getBindingPower(XX::TokenType t) {
   }
 }
 
+// b is for binding power in case I forget it.
 XX::AST::Expr *XX::Parser::parseExpr(int b) {
   AST::Expr *left = parseLiteral();
   advance();
-  uint32_t o;
-  uint16_t l;
-  std::string op;
-  AST::Expr *right;
   while (b < getBindingPower(currentToken.type)) {
-    o = currentToken.offset;
-    l = currentToken.length;
-    op = source.substr(currentToken.offset, currentToken.length);
-    right = parseExpr(getBindingPower(currentToken.type));
+    uint32_t o = currentToken.offset;
+    uint16_t l = currentToken.length;
+    std::string op = source.substr(currentToken.offset, currentToken.length);
+    int currB = getBindingPower(currentToken.type);
+    AST::Expr *right = parseExpr(currB);
+    left = new AST::BinaryExpr(o, l, op, left, right);
   }
-  return new AST::BinaryExpr(o, l, op, left, right);
+  return left;
 }
 
 XX::AST::Expr *XX::Parser::parseLiteral() {

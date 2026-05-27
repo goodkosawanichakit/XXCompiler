@@ -81,7 +81,7 @@ void XX::AST::Dumper::dumpVarDeclr(VarDeclr *node) {
     return;
   std::cout << matchEnumKind(node->getKind()) << ' '
             << matchEnumType(node->getType()) << " Name: " << node->getVarName()
-            << ' ' << getLine(node->getOffset()) << std::endl;
+            << std::endl;
   dumpExpr(node->getExpr());
 }
 
@@ -102,7 +102,7 @@ void XX::AST::Dumper::dumpBinaryExpr(BinaryExpr *node) {
   if (!node)
     return;
   std::cout << matchEnumKind(node->getKind()) << " Operator: " << node->getOP()
-            << ' ' << getLine(node->getOffset()) << std::endl;
+            << std::endl;
   dumpExpr(node->getLExpr());
   dumpExpr(node->getRExpr());
 }
